@@ -2,11 +2,11 @@
 
 PacletObject[
   <|
-    "Name" -> "KirillBelov/Internal",
+    "Name" -> "WLJS/Internal",
     "Description" -> "Internal",
-    "Creator" -> "Kirill Belov",
+    "Creator" -> "Kirill",
     "License" -> "MIT",
-    "PublisherID" -> "KirillBelov",
+    "PublisherID" -> "WLJS",
     "Version" -> "1.0.10",
     "WolframVersion" -> "13+",
     "Extensions" -> {
@@ -14,33 +14,33 @@ PacletObject[
         "Kernel",
         "Root" -> "Kernel",
         "Context" -> {
-          {"KirillBelov`Internal`", "Internal.wl"},
+          {"WLJS`Internal`", "Internal.wl"},
           {
-            "KirillBelov`Internal`Compilation`",
+            "WLJS`Internal`Compilation`",
             "Compilation.wl"
           },
           {
-            "KirillBelov`Internal`Binary`",
+            "WLJS`Internal`Binary`",
             "Binary.wl"
           },
           {
-            "KirillBelov`Internal`Tasks`",
+            "WLJS`Internal`Tasks`",
             "Tasks.wl"
           },
           {
-            "KirillBelov`Internal`Functions`",
+            "WLJS`Internal`Functions`",
             "Functions.wl"
           },
           {
-            "KirillBelov`Internal`Console`",
+            "WLJS`Internal`Console`",
             "Console.wl"
           },
           {
-            "KirillBelov`Internal`Alpha`",
+            "WLJS`Internal`Alpha`",
             "Alpha.wl"
           }
         },
-        "Symbols" -> {"KirillBelov`Internal`AssocMatchQ"}
+        "Symbols" -> {}
       },
       {"Documentation", "Language" -> "English"},
       {"LibraryLink", "Root" -> "LibraryResources"},

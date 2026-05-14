@@ -1,9 +1,9 @@
 (* :Package: *)
 
-BeginPackage["KirillBelov`Internal`EventLoop`"];
+BeginPackage["WLJS`Internal`EventLoop`"];
 
 
-EventLoop::usage = 
+EventLoop::usage =
 "EventLoop[expr] evaluates expr in a loop until the user interrupts it. It is useful for debugging and testing.";
 
 

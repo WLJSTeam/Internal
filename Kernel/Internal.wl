@@ -1,21 +1,21 @@
 (*:Package:*)
 
-BeginPackage["KirillBelov`Internal`"]; 
+BeginPackage["WLJS`Internal`"];
 
 
-EndPackage[]; 
+EndPackage[];
 
 
-Get["KirillBelov`Internal`Compilation`"]; 
+Get["WLJS`Internal`Compilation`"];
 
 
-Get["KirillBelov`Internal`Tasks`"]; 
+Get["WLJS`Internal`Tasks`"];
 
 
-Get["KirillBelov`Internal`Functions`"]; 
+Get["WLJS`Internal`Functions`"];
 
 
-Get["KirillBelov`Internal`Binary`"]; 
+Get["WLJS`Internal`Binary`"];
 
 
-Get["KirillBelov`Internal`Console`"]; 
+Get["WLJS`Internal`Console`"];

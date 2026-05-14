@@ -1,38 +1,38 @@
 (* :Package: *)
 
-BeginPackage["KirillBelov`Internal`Alpha`"]; 
+BeginPackage["WLJS`Internal`Alpha`"];
 
 
-WolframAlphaXML::usage = 
-"WolframAlphaXML[query] returns xml data from wolfram alpha API."; 
+WolframAlphaXML::usage =
+"WolframAlphaXML[query] returns xml data from wolfram alpha API.";
 
 
-WolframAlphaLLM::usage = 
-"WolframAlphaLLM[query] returns formatted answer optimazed for LLMs."; 
+WolframAlphaLLM::usage =
+"WolframAlphaLLM[query] returns formatted answer optimazed for LLMs.";
 
 
-WolframAlphaMD::usage = 
-"WolframAlphaMD[query] returns list of markdown blocks."; 
+WolframAlphaMD::usage =
+"WolframAlphaMD[query] returns list of markdown blocks.";
 
 
-Begin["`Private`"]; 
+Begin["`Private`"];
 
 
-WolframAlphaXML[query_String] := 
-URLRead[Internal`HouseKeep[$xmlEndpoint, {"input" -> URLEncode[query]}]]["Body"]; 
+WolframAlphaXML[query_String] :=
+URLRead[Internal`HouseKeep[$xmlEndpoint, {"input" -> URLEncode[query]}]]["Body"];
 
 
-WolframAlphaLLM[query_String] := 
-URLRead[Internal`HouseKeep[$llmEndpoint, {"input" -> URLEncode[query]}]]["Body"]; 
+WolframAlphaLLM[query_String] :=
+URLRead[Internal`HouseKeep[$llmEndpoint, {"input" -> URLEncode[query]}]]["Body"];
 
 
-$xmlEndpoint = "https://api.wolframalpha.com/v1/query.jsp"; 
+$xmlEndpoint = "https://api.wolframalpha.com/v1/query.jsp";
 
 
-$llmEndpoint = StringReplace[$xmlEndpoint, "query.jsp" -> "llm-api"]; 
+$llmEndpoint = StringReplace[$xmlEndpoint, "query.jsp" -> "llm-api"];
 
 
-End[]; 
+End[];
 
 
-EndPackage[]; 
+EndPackage[];

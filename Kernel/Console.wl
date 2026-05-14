@@ -1,65 +1,65 @@
 (* ::Package:: *)
 
-BeginPackage["KirillBelov`Internal`Console`"]; 
+BeginPackage["WLJS`Internal`Console`"];
 
 
-ConsolePrint::usage = 
-"ConsolePrint[text, style] prints styled text to console."; 
+ConsolePrint::usage =
+"ConsolePrint[text, style] prints styled text to console.";
 
 
-ConsoleEcho::usage = 
+ConsoleEcho::usage =
 "ConsoleEcho[message, name] prints mesage with specific name.";
 
 
-ConsolePrintMessage::usage = 
-"ConsolePrintError[message, args] print mesage for the symbol."; 
+ConsolePrintMessage::usage =
+"ConsolePrintError[message, args] print mesage for the symbol.";
 
 
-Begin["`Private`"]; 
+Begin["`Private`"];
 
 
-ConsolePrint[text_String, style_String] := 
-WriteString[$Output, style <> text <> DEFAULT]; 
+ConsolePrint[text_String, style_String] :=
+WriteString[$Output, style <> text <> DEFAULT];
 
 
-ConsolePrint[text_String] := 
-WriteString[$Output, text]; 
+ConsolePrint[text_String] :=
+WriteString[$Output, text];
 
 
-ConsolePrint[expr_, rest___] := 
-ConsolePrint[ImportString[ToString[expr], "Text"], rest]; 
+ConsolePrint[expr_, rest___] :=
+ConsolePrint[ImportString[ToString[expr], "Text"], rest];
 
 
 ConsoleEcho[message_, name_String] := (
-    ConsolePrint["\:276f " <> DateString[] <> " \:276f " <> ToUpperCase[name] <> " \:276f ", YELLOWDARK]; 
-    ConsolePrint["\n"]; 
-    ConsolePrint[message]; 
-    ConsolePrint["\n"]; 
-    ConsolePrint["\n"]; 
+    ConsolePrint["\:276f " <> DateString[] <> " \:276f " <> ToUpperCase[name] <> " \:276f ", YELLOWDARK];
+    ConsolePrint["\n"];
+    ConsolePrint[message];
+    ConsolePrint["\n"];
+    ConsolePrint["\n"];
     message
-); 
+);
 
 
-ConsoleEcho[message_Association?AssociationQ, name_String] := 
-(ConsoleEcho[AssocToConsoleString[message], name]; message); 
+ConsoleEcho[message_Association?AssociationQ, name_String] :=
+(ConsoleEcho[AssocToConsoleString[message], name]; message);
 
 
-ConsoleEcho[name_String][msg_] := 
-ConsoleEcho[msg, name]; 
+ConsoleEcho[name_String][msg_] :=
+ConsoleEcho[msg, name];
 
 
-SetAttributes[ConsolePrintMessage, HoldFirst]; 
+SetAttributes[ConsolePrintMessage, HoldFirst];
 
 
-ConsolePrintMessage[MessageName[symbol_Symbol, messageName_String], args___] := 
-Module[{symbolName = SymbolName[Unevaluated[symbol]]}, 
-    ConsolePrint[symbolName, BOLD <> RED]; 
-    ConsolePrint["::", BOLD]; 
-    ConsolePrint[messageName, BOLD <> RED]; 
-    ConsolePrint[" ", DEFAULT]; 
-    ConsolePrint[StringTemplate[MessageName[symbol, messageName]][args], RED]; 
-    ConsolePrint["\n", DEFAULT]; 
-]; 
+ConsolePrintMessage[MessageName[symbol_Symbol, messageName_String], args___] :=
+Module[{symbolName = SymbolName[Unevaluated[symbol]]},
+    ConsolePrint[symbolName, BOLD <> RED];
+    ConsolePrint["::", BOLD];
+    ConsolePrint[messageName, BOLD <> RED];
+    ConsolePrint[" ", DEFAULT];
+    ConsolePrint[StringTemplate[MessageName[symbol, messageName]][args], RED];
+    ConsolePrint["\n", DEFAULT];
+];
 
 
 
@@ -107,46 +107,46 @@ YELLOW = "\033[93m";
 BLUE = "\033[94m";
 PURPLE = "\033[95m";
 CYAN = "\033[96m";
-WHITE = "\033[97m"; 
+WHITE = "\033[97m";
 
 
-$PrintAssocIndent = ""; 
-$PrintAssocBracketColors = {BLUEDARK, PURPLEDARK, CYANDARK, GREENDARK, GREEN, CYAN, BLUE, RED, PURPLE, REDDARK}; 
-$PrintAssocBracketColorIndex = 1; 
+$PrintAssocIndent = "";
+$PrintAssocBracketColors = {BLUEDARK, PURPLEDARK, CYANDARK, GREENDARK, GREEN, CYAN, BLUE, RED, PURPLE, REDDARK};
+$PrintAssocBracketColorIndex = 1;
 
 
-AssocToConsoleString[assoc_Association] := 
-Module[{$result = ""}, 
-    $result = 
-        $result <> 
-        $PrintAssocIndent <> 
-        $PrintAssocBracketColors[[$PrintAssocBracketColorIndex]] <> 
-        "<|" <> 
-        DEFAULT <> 
+AssocToConsoleString[assoc_Association] :=
+Module[{$result = ""},
+    $result =
+        $result <>
+        $PrintAssocIndent <>
+        $PrintAssocBracketColors[[$PrintAssocBracketColorIndex]] <>
+        "<|" <>
+        DEFAULT <>
         If[Length[assoc] > 0, "\n", ""];
-    
-    If[Length[assoc] > 0, 
+
+    If[Length[assoc] > 0,
 
         $result = $result <> Block[{
-            $PrintAssocIndent = $PrintAssocIndent <> "  ", 
+            $PrintAssocIndent = $PrintAssocIndent <> "  ",
             $PrintAssocBracketColorIndex = $PrintAssocBracketColorIndex + 1
-        }, 
+        },
             $PrintAssocIndent <> StringRiffle[KeyValueMap[StringTrim[PairToConsoleString[#1, #2]]&, assoc], ",\n" <> $PrintAssocIndent] <> "\n"
         ];
-    ]; 
-    
-    $result = $result <>  
-        If[Length[assoc] > 0, $PrintAssocIndent, ""] <> 
-        $PrintAssocBracketColors[[$PrintAssocBracketColorIndex]] <> 
-        "|>" <> 
-        DEFAULT <> 
+    ];
+
+    $result = $result <>
+        If[Length[assoc] > 0, $PrintAssocIndent, ""] <>
+        $PrintAssocBracketColors[[$PrintAssocBracketColorIndex]] <>
+        "|>" <>
+        DEFAULT <>
         "\n";
-        
+
     Return[$result]
 ];
 
 
-PairToConsoleString[key_, value_] := 
+PairToConsoleString[key_, value_] :=
 $PrintAssocIndent <> ToKey[key] <> " -> " <> ToValue[value];
 
 
@@ -168,33 +168,33 @@ ToValue[b_?BooleanQ] := If[b, GREENDARK, REDDARK] <> ToString[b] <> DEFAULT;
 ToValue[a_?AssociationQ] := StringTrim[AssocToConsoleString[a]];
 
 
-ToValue[a_?ListQ] := 
-Module[{}, 
-    If[Length[a] > 0, 
-        $PrintAssocBracketColors[[$PrintAssocBracketColorIndex]] <> 
-        "{\n" <> 
-        DEFAULT <> 
-        Block[{$PrintAssocIndent = $PrintAssocIndent <> "  ", $PrintAssocBracketColorIndex = $PrintAssocBracketColorIndex + 1}, 
+ToValue[a_?ListQ] :=
+Module[{},
+    If[Length[a] > 0,
+        $PrintAssocBracketColors[[$PrintAssocBracketColorIndex]] <>
+        "{\n" <>
+        DEFAULT <>
+        Block[{$PrintAssocIndent = $PrintAssocIndent <> "  ", $PrintAssocBracketColorIndex = $PrintAssocBracketColorIndex + 1},
             $PrintAssocIndent <> StringRiffle[Map[ToValue, a], ",\n" <> $PrintAssocIndent] <> "\n"
-        ] <> 
-        $PrintAssocIndent <> 
-        $PrintAssocBracketColors[[$PrintAssocBracketColorIndex]] <> 
-        "}" <> 
-        DEFAULT, 
+        ] <>
+        $PrintAssocIndent <>
+        $PrintAssocBracketColors[[$PrintAssocBracketColorIndex]] <>
+        "}" <>
+        DEFAULT,
         $PrintAssocBracketColors[[$PrintAssocBracketColorIndex]] <> "{}" <> DEFAULT
     ]
 ];
 
 
-ToValue[date_?DateObjectQ] := 
-PURPLE <> DateString[date] <> DEFAULT; 
+ToValue[date_?DateObjectQ] :=
+PURPLE <> DateString[date] <> DEFAULT;
 
 
-ToValue[expr_] := 
+ToValue[expr_] :=
 ToString[expr];
 
 
-End[(*`Private`*)]; 
+End[(*`Private`*)];
 
 
-EndPackage[(*KirillBelov`Internal`Console`*)]; 
+EndPackage[(*KirillBelov`Internal`Console`*)];

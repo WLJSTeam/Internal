@@ -1,35 +1,35 @@
 (*:Package:*)
 
-BeginPackage["KirillBelov`Internal`Tasks`", {
-    "LibraryLink`", 
-    "Parallel`Developer`", 
-    "KirillBelov`Internal`Compilation`"
-}]; 
+BeginPackage["WLJS`Internal`Tasks`", {
+    "LibraryLink`",
+    "Parallel`Developer`",
+    "WLJS`Internal`Compilation`"
+}];
 
 
-ClearAll["`*"]; 
+ClearAll["`*"];
 
 
-CreateBackgroundTask::usage = 
-"CreateBackgroundTask[expr, {interval, count}] run expr in background like in ScheduledTask where interval in seconds."; 
+CreateBackgroundTask::usage =
+"CreateBackgroundTask[expr, {interval, count}] run expr in background like in ScheduledTask where interval in seconds.";
 
 
-AsyncEvaluate::usage = 
-"AsyncEvaluate[expr, finish] evaluates expression on parallel kernel and call finish[result] function on master kernel."; 
+AsyncEvaluate::usage =
+"AsyncEvaluate[expr, finish] evaluates expression on parallel kernel and call finish[result] function on master kernel.";
 
 
-URLReadAsync::usage = 
-"URLReadAsync[request, func] execute request in async mode and call func on response."; 
+URLReadAsync::usage =
+"URLReadAsync[request, func] execute request in async mode and call func on response.";
 
 
-$BackgroundEvent::usage = 
-"Current background task event."; 
+$BackgroundEvent::usage =
+"Current background task event.";
 
 
-Begin["`Private`"]; 
+Begin["`Private`"];
 
 
-SetAttributes[CreateBackgroundTask, HoldFirst]; 
+SetAttributes[CreateBackgroundTask, HoldFirst];
 
 
 Options[CreateBackgroundTask] = {
@@ -37,119 +37,119 @@ Options[CreateBackgroundTask] = {
 };
 
 
-CreateBackgroundTask[expr_, {interval_?NumericQ, count_Integer?Positive}, OptionsPattern[]] /; interval >= 0.001 := 
+CreateBackgroundTask[expr_, {interval_?NumericQ, count_Integer?Positive}, OptionsPattern[]] /; interval >= 0.001 :=
 With[{
-	intervalMs = Round[interval * 1000], 
+    intervalMs = Round[interval * 1000],
     stopCondition = OptionValue["StopCondition"]
-},     
+},
     Internal`CreateAsynchronousTask[
-        startBackgroundTask, 
-        {intervalMs, count}, 
+        startBackgroundTask,
+        {intervalMs, count},
         (
             PreemptProtect[
                 $BackgroundEvent = {##};
-                expr; 
+                expr;
 
-                If[stopCondition[##], 
-                    StopAsynchronousTask[#1]; 
-                    RemoveAsynchronousTask[#1]; 
+                If[stopCondition[##],
+                    StopAsynchronousTask[#1];
+                    RemoveAsynchronousTask[#1];
                 ];
-            ]; 
+            ];
         )&
     ]
-]; 
+];
 
 
 Options[AsyncEvaluate] := {
     "Once" -> False
-}; 
+};
 
 
-SetAttributes[AsyncEvaluate, HoldFirst]; 
+SetAttributes[AsyncEvaluate, HoldFirst];
 
 
-AsyncEvaluate[expr_, handler_, OptionsPattern[]] := 
-With[{id = If[#, Hash[Hold[expr]], Hash[CreateUUID[]]]& @ OptionValue["Once"]}, 
-    initAsyncTools[]; 
-    
+AsyncEvaluate[expr_, handler_, OptionsPattern[]] :=
+With[{id = If[#, Hash[Hold[expr]], Hash[CreateUUID[]]]& @ OptionValue["Once"]},
+    initAsyncTools[];
+
     If[!KeyExistsQ[$asyncTasks, id], $asyncTasks[id] = <|
-        "Task" -> ParallelSubmit[expr], 
-        "Id" -> id, 
+        "Task" -> ParallelSubmit[expr],
+        "Id" -> id,
         "Handler" -> handler
-    |>]; 
+    |>];
 
     AsyncTask[id]
-]; 
+];
 
 
-If[!ValueQ[$asyncToolsNeedInit], $asyncToolsNeedInit = True]; 
+If[!ValueQ[$asyncToolsNeedInit], $asyncToolsNeedInit = True];
 
 
-initAsyncTools[] := 
-If[$asyncToolsNeedInit, 
-    $asyncTasks = <||>; 
+initAsyncTools[] :=
+If[$asyncToolsNeedInit,
+    $asyncTasks = <||>;
 
-    $asyncWatcher = CreateBackgroundTask[checkAsyncTasks[], {0.001, 10^10}]; 
+    $asyncWatcher = CreateBackgroundTask[checkAsyncTasks[], {0.001, 10^10}];
 
-    $asyncToolsNeedInit = False; 
-]; 
+    $asyncToolsNeedInit = False;
+];
 
 
-checkAsyncTasks[] := 
-If[Length[$asyncTasks] > 0, 
-    Parallel`Developer`QueueRun[]; 
-    Map[If[Parallel`Developer`DoneQ[#Task], 
-        KeyDropFrom[$asyncTasks, #Id]; 
+checkAsyncTasks[] :=
+If[Length[$asyncTasks] > 0,
+    Parallel`Developer`QueueRun[];
+    Map[If[Parallel`Developer`DoneQ[#Task],
+        KeyDropFrom[$asyncTasks, #Id];
         #Handler[ReleaseHold[#Task["Result"]]]
     ]&, $asyncTasks]
-]; 
+];
 
 
-URLReadAsync[request_HTTPRequest, func_, "Stream"] := 
+URLReadAsync[request_HTTPRequest, func_, "Stream"] :=
 AsyncEvaluate[
     Module[{
         stream = URLRead[request, "Stream"], part = "", response = ""
-    }, 
-        While[True, 
-            part = ReadString[stream]; 
-            If[part === EndOfFile, Break[]]; 
-            response = response <> part; 
-        ]; 
+    },
+        While[True,
+            part = ReadString[stream];
+            If[part === EndOfFile, Break[]];
+            response = response <> part;
+        ];
 
-        Close[stream]; 
+        Close[stream];
 
         response
-    ], 
-    func, 
+    ],
+    func,
     "Once" -> True
-]; 
+];
 
 
-URLReadAsync[request_HTTPRequest, func_] := 
+URLReadAsync[request_HTTPRequest, func_] :=
 AsyncEvaluate[
-    URLRead[request], 
-    func, 
+    URLRead[request],
+    func,
     "Once" -> True
-]; 
+];
 
 
-$asyncTasks = 
-<||>; 
+$asyncTasks =
+<||>;
 
 
-$directory = 
-DirectoryName[$InputFileName, 2]; 
+$directory =
+DirectoryName[$InputFileName, 2];
 
 
-$backgroundTaskLibrary = 
-LibraryResource[$directory, "backgroundTask"]; 
+$backgroundTaskLibrary =
+LibraryResource[$directory, "backgroundTask"];
 
 
-startBackgroundTask = 
-LibraryFunctionLoad[$backgroundTaskLibrary, "startBackgroundTask", {Integer, Integer}, Integer]; 
+startBackgroundTask =
+LibraryFunctionLoad[$backgroundTaskLibrary, "startBackgroundTask", {Integer, Integer}, Integer];
 
 
-End[]; 
+End[];
 
 
-EndPackage[]; 
+EndPackage[];
