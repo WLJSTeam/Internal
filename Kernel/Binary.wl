@@ -20,7 +20,15 @@ ByteMask::usage =
 "ByteMask[mask, numericArray] returns masked numeric array.";
 
 
+BytesExtract::usage =
+"BytesExtract[data, sep -> n] returns n-s part of data splitted using sep.";
+
+
 Begin["`Private`"];
+
+
+BytesExtract[data_ByteArray, (sep_ByteArray) -> (n_Integer?Positive)] :=
+
 
 
 BytesPosition[data_ByteArray, bytes_ByteArray, n_Integer: 1] :=
