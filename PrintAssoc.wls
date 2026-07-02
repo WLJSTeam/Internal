@@ -3,8 +3,12 @@
 PacletDirectoryLoad[Directory[]];
 Get["WLJS`Internal`Console`"];
 
-ConsoleEcho["Print Assoc Example"] @
-<|"DateObject" -> Now, "BoolValues" -> {True, False}, "Array" -> {1, 2, 3, 4, 5}, "String" -> "Hello, World!"|>;
 
-Echo[#, "Print Assoc Example"]& @
-<|"DateObject" -> Now, "BoolValues" -> {True, False}, "Array" -> {1, 2, 3, 4, 5}, "String" -> "Hello, World!"|>;
+request = HTTPRequest["https://jsonplaceholder.typicode.com/todos/1", <|
+    "Method" -> "POST",
+    "Headers" -> <|"Content-Type" -> "application/json"|>,
+    "Body" -> ExportString[<|"title" -> "foo", "body" -> "bar", "userId" -> 1|>, "JSON"]|>
+];
+
+ConsoleEcho["Print Assoc Example"] @
+ExportString[request, "HTTPRequest"];

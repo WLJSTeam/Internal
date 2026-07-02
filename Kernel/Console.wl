@@ -168,7 +168,7 @@ ToValue[b_?BooleanQ] := If[b, GREENDARK, REDDARK] <> ToString[b] <> DEFAULT;
 ToValue[a_?AssociationQ] := StringTrim[AssocToConsoleString[a]];
 
 
-ToValue[a_?ListQ] :=
+ToValue[a_?ListQ] /; Length[a] <= 10 :=
 Module[{},
     If[Length[a] > 0,
         $PrintAssocBracketColors[[$PrintAssocBracketColorIndex]] <>
@@ -184,6 +184,10 @@ Module[{},
         $PrintAssocBracketColors[[$PrintAssocBracketColorIndex]] <> "{}" <> DEFAULT
     ]
 ];
+
+
+ToValue[a_?ListQ] /; Length[a] > 10 :=
+ToValue[Join[a[[ ;; 5]], {"< .. >"}, a[[-5]]]];
 
 
 ToValue[date_?DateObjectQ] :=

@@ -28,7 +28,13 @@ Begin["`Private`"];
 
 
 BytesExtract[data_ByteArray, (sep_ByteArray) -> (n_Integer?Positive)] :=
-
+Module[{parts = BytesSplit[data, sep -> n]},
+    If[Length[parts] === 2,
+        parts[[2]],
+    (*Else*)
+        ByteArray[{}]
+    ]
+];
 
 
 BytesPosition[data_ByteArray, bytes_ByteArray, n_Integer: 1] :=
