@@ -8,7 +8,8 @@ ConsolePrint::usage =
 
 
 ConsoleEcho::usage =
-"ConsoleEcho[message, name] prints mesage with specific name.";
+"ConsoleEcho[message, name] prints mesage with specific name.
+ConsoleEcho[name] returns a func for printing messages with specific name.";
 
 
 ConsolePrintMessage::usage =

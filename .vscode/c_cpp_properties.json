@@ -5,7 +5,8 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "C:/${WOLFRAM_SYSTEM_DIRECTORY}/SystemFiles/IncludeFiles/C",
-                "C:/${WOLFRAM_SYSTEM_DIRECTORY}/SystemFiles/Components/StandaloneApplicationsSDK/Windows-x86-64"
+                "C:/${WOLFRAM_SYSTEM_DIRECTORY}/SystemFiles/Components/StandaloneApplicationsSDK/Windows-x86-64",
+                "/Applications/Wolfram Engine.app/Contents/Resources/Wolfram Player.app/Contents/SystemFiles/IncludeFiles/C"
             ],
             "defines": [
                 "_DEBUG",
@@ -17,6 +18,17 @@
             "cStandard": "c17",
             "cppStandard": "c++17",
             "intelliSenseMode": "windows-msvc-x64"
+        },
+        {
+            "name": "Mac",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/clang",
+            "cStandard": "c17",
+            "cppStandard": "c++14",
+            "intelliSenseMode": "macos-clang-arm64"
         }
     ],
     "version": 4
