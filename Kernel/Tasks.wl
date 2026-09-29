@@ -3,7 +3,8 @@
 BeginPackage["WLJS`Internal`Tasks`", {
     "LibraryLink`",
     "Parallel`Developer`",
-    "WLJS`Internal`Compilation`"
+    "WLJS`Internal`Compilation`",
+    "WLJS`CSockets`"
 }];
 
 
@@ -27,6 +28,20 @@ $BackgroundEvent::usage =
 
 
 Begin["`Private`"];
+
+
+init[] :=
+Module[{
+    doneServer = CSocketOpen["localhost", 0, "TCP"],
+    donePort
+},
+    donePort = doneServer["DestinationPort"];
+    LaunchKernels[];
+
+
+
+    Parallel`Developer`QueueRun[];
+];
 
 
 SetAttributes[CreateBackgroundTask, HoldFirst];
