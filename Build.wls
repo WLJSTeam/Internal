@@ -1,0 +1,161 @@
+#!/usr/bin/env wolframscript
+
+Get["CCompilerDriver`"];
+Get["LibraryLink`"];
+
+
+$libraryLinkVersion =
+Which[
+    $VersionNumber >= 14.3,
+        8,
+    $VersionNumber >= 13.1,
+        7,
+    $VersionNumber >= 12.1,
+        6,
+    $VersionNumber >= 12.0,
+        5,
+    $VersionNumber >= 11.2,
+        4,
+    $VersionNumber >= 10.0,
+        3,
+    $VersionNumber >= 9.0,
+        2,
+    True,
+        1
+];
+
+
+$directory =
+DirectoryName @ If[$InputFileName == "", NotebookFileName[], $InputFileName];
+
+
+$sourceDirectory =
+FileNameJoin[{$directory, "Source"}];
+
+
+$sourceFiles =
+FileNames["*.c", {$sourceDirectory}];
+
+
+$libraryDirectory =
+FileNameJoin[{$directory, "LibraryResources", $SystemID <> "-v" <> ToString[$libraryLinkVersion]}];
+
+
+$packageDirectory =
+FileNameJoin[{$directory, "Kernel"}];
+
+
+$packageFile =
+FileNameJoin[{$packageDirectory, "Library.wl"}];
+
+
+$packageCode =
+Import[$packageFile, "String"];
+
+
+If[!FileExistsQ[$libraryDirectory], CreateDirectory[$libraryDirectory]];
+
+
+build[library_String, prot_: Automatic] :=
+CreateLibrary[$sourceFiles, library,
+    "TargetDirectory" -> $libraryDirectory,
+    "Debug" -> True,
+    "TransferProtocolLibrary" -> prot,
+    "ShellCommandFunction" -> Print,
+    "ShellOutputFunction" -> Print,
+    "SystemCompileOptions" -> "/Ox /GL",
+    "IncludeDirectories" -> {$sourceDirectory}
+];
+
+
+build["internal"];
+
+
+snakeToCamelCase[str_String] :=
+StringReplace[str, "_" ~~ c: LetterCharacter :> ToUpperCase[c]];
+
+
+parseDefinition[definition_String] :=
+Module[{$name, $argTypes, $argNames, $argNumbers, $argLines, $resultLines},
+    $name = StringCases[definition,
+        Shortest[
+            "DLLEXPORT int " ~~
+            name__ ~~
+            "(WolframLibraryData libData, mint Argc, MArgument *Args, MArgument Res)"] :> name][[1]];
+
+    $argLines = Select[StringContainsQ[#, "MArgument_get"]&] @ StringSplit[definition, "\n"];
+
+    $argNames = Map[StringCases[#,
+        Shortest[LetterCharacter.. ~~ {" *", " ", "* "} ~~ (argName: {"_", LetterCharacter}..) ~~ {" =", "="} ~~ ___ ~~ "MArgument_get"] :>
+            snakeToCamelCase[argName]
+    ][[1]]&] @ $argLines;
+
+    $argTypes = Map[StringCases[#,
+        Shortest["MArgument_get" ~~ type__ ~~ "("] :> (type /. {
+            "UTF8String" -> String,
+            "Integer" -> Integer,
+            "Real" -> Real,
+            "Boolean" -> Boolean,
+            "Complex" -> Complex,
+            "MNumericArray" -> {"\"ByteArray\"", "\"Shared\""},
+            "MTensor" -> {Integer, 1}
+        })
+    ][[1]]&] @ $argLines;
+
+    $argNumbers = Map[StringCases[#,
+        Shortest["MArgument_get" ~~ __ ~~ "(Args[" ~~ num__ ~~ "]"] :> ToExpression[num]
+    ][[1]]&] @ $argLines;
+
+    $resultLines = Select[StringContainsQ[#, "MArgument_set"]&] @ StringSplit[definition, "\n"];
+
+    If[$resultLines =!= {},
+        $resultType = StringCases[$resultLines[[1]], Shortest["MArgument_set" ~~ type__ ~~ "("] :> (type /. {
+            "UTF8String" -> String,
+            "Integer" -> Integer,
+            "Real" -> Real,
+            "Boolean" -> Boolean,
+            "Complex" -> Complex,
+            "MNumericArray" -> "\"ByteArray\"",
+            "MTensor" -> {Integer, 1}
+        })][[1]],
+        $resultType = "\"Void\""
+    ];
+
+    If[$resultType == {Integer, 1},
+        $resultType = {Integer, First[StringCases[definition,
+            Shortest["MTensor_new(MType_Integer," ~~ n__ ~~ ","] :> ToExpression[n]
+        ]]}
+    ];
+
+    $resultName = If[$resultType === "\"Void\"",
+        "",
+        StringCases[$resultLines[[-1]], Shortest["MArgument_set" ~~ __ ~~ "(Res," ~~ name__ ~~ ")"] :>
+            snakeToCamelCase[StringTrim[name]]][[1]]
+    ];
+
+    StringTemplate["`1`::usage =\n\"`1`[`3`]`6`.\";\n\n\n`1` =\nLibraryFunctionLoad[$library, \"`1`\", `2`, `5`];"][
+        $name, $argTypes, StringRiffle[$argNames, ", "], $argNumbers, $resultType, If[# === "", "", " -> " <> #]& @ $resultName]
+];
+
+
+$bindCode =
+Module[{code, definitions, bindCode},
+    code = StringRiffle[Map[Import[#, "String"]&] @ $sourceFiles, "\n\n\n"];
+
+    definitions = StringCases[code, Shortest["DLLEXPORT int " ~~ LetterCharacter.. ~~ "(WolframLibraryData libData, mint Argc, MArgument *Args, MArgument Res)" ~~ __ ~~ "\n}"]];
+
+    bindCode = StringRiffle[Map[parseDefinition] @ definitions, "\n\n\n"];
+
+    bindCode
+];
+
+
+If[StringContainsQ[$packageCode, "(* :LibraryLoad: *)"],
+    $packageCode = StringReplace[$packageCode, {
+        "(* :LibraryLoad: *)" ~~ __ ~~ "End[];" :>
+        "(* :LibraryLoad: *)\n\n\n" <> $bindCode <> "\n\n\nEnd[];",
+        "\r" -> ""
+    }];
+
+    WriteString[$packageFile, $packageCode];
+];
