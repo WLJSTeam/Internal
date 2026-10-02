@@ -29,7 +29,8 @@ static void runBackgroundTask(mint taskId, void* args)
 }
 
 
-DLLEXPORT int startBackgroundTask(WolframLibraryData libData, mint Argc, MArgument *Args, MArgument Res) {
+DLLEXPORT int startBackgroundTask(WolframLibraryData libData, mint Argc, MArgument *Args, MArgument Res)
+{
     if (Argc != 2) {
         return LIBRARY_FUNCTION_ERROR;
     }

@@ -38,6 +38,10 @@ PacletObject[
           {
             "WLJS`Internal`Alpha`",
             "Alpha.wl"
+          },
+          {
+            "WLJS`Internal`Library`",
+            "Library.wl"
           }
         },
         "Symbols" -> {}

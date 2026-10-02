@@ -1,7 +1,8 @@
 #include "binary.h"
 
 
-DLLEXPORT int byteMask(WolframLibraryData libData, mint Argc, MArgument *Args, MArgument Res) {
+DLLEXPORT int byteMask(WolframLibraryData libData, mint Argc, MArgument *Args, MArgument Res)
+{
     MNumericArray nMask = MArgument_getMNumericArray(Args[0]);
 
     uint8_t* mask = (uint8_t *)libData->numericarrayLibraryFunctions->MNumericArray_getData(nMask);
@@ -35,7 +36,8 @@ DLLEXPORT int byteMask(WolframLibraryData libData, mint Argc, MArgument *Args, M
 }
 
 
-DLLEXPORT int bytesPosition(WolframLibraryData libData, mint Argc, MArgument *Args, MArgument Res) {
+DLLEXPORT int bytesPosition(WolframLibraryData libData, mint Argc, MArgument *Args, MArgument Res)
+{
     MNumericArray ndata = MArgument_getMNumericArray(Args[0]);
     uint8_t* data = (uint8_t *)libData->numericarrayLibraryFunctions->MNumericArray_getData(ndata);
     const mint dataLen = MArgument_getInteger(Args[1]);
