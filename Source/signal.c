@@ -68,7 +68,6 @@ static void waitSignal(mint taskId, void *args)
             break;
         }
 #endif
-
         ds = libData->ioLibraryFunctions->createDataStore();
         libData->ioLibraryFunctions->DataStore_addInteger(ds, n++);
         libData->ioLibraryFunctions->raiseAsyncEvent(taskId, "AsyncSignal", ds);
