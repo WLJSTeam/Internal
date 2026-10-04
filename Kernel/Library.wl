@@ -6,11 +6,33 @@ BeginPackage["WLJS`Internal`Library`"];
 Begin["`Private`"];
 
 
-createWaitLoopTask[] :=
-Internal`CreateAsynchronousTask[createWaitLoop, {}, Echo[{##}]&];
+getLibraryLinkVersion[] := getLibraryLinkVersion[] =
+Which[
+    $VersionNumber >= 14.3,
+        8,
+    $VersionNumber >= 13.1,
+        7,
+    $VersionNumber >= 12.1,
+        6,
+    $VersionNumber >= 12.0,
+        5,
+    $VersionNumber >= 11.2,
+        4,
+    $VersionNumber >= 10.0,
+        3,
+    $VersionNumber >= 9.0,
+        2,
+    True,
+        1
+];
 
 
-$library = FileNameJoin[{DirectoryName[$InputFileName, 2], "LibraryResources", "Windows-x86-64-v8", "Internal.dll"}];
+$library = FileNameJoin[{
+    DirectoryName[$InputFileName, 2],
+    "LibraryResources",
+    $SystemID <> "-v" <> ToString[getLibraryLinkVersion[]],
+    "internal." <> Internal`DynamicLibraryExtension[]
+}];
 
 
 (* :LibraryLoad: *)

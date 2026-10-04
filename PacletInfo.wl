@@ -42,6 +42,10 @@ PacletObject[
           {
             "WLJS`Internal`Library`",
             "Library.wl"
+          },
+          {
+            "WLJS`Internal`AsyncEvaluate`",
+            "AsyncEvaluate.wl"
           }
         },
         "Symbols" -> {}

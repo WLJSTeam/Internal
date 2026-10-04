@@ -1,0 +1,22 @@
+---
+triple:          'arm64-apple-darwin'
+binary-path:     '/Users/daria/Projects/Internal/LibraryResources/MacOSX-ARM64-v8/Working-Air-76084-143835904-1/internal.dylib'
+relocations:
+  - { offset: 0x26, size: 0x8, addend: 0x0, symName: _startBackgroundTask, symObjAddr: 0x0, symBinAddr: 0x598, symSize: 0x114 }
+  - { offset: 0x1087, size: 0x8, addend: 0x0, symName: _startBackgroundTask, symObjAddr: 0x0, symBinAddr: 0x598, symSize: 0x114 }
+  - { offset: 0x1111, size: 0x8, addend: 0x0, symName: _runBackgroundTask, symObjAddr: 0x114, symBinAddr: 0x6AC, symSize: 0x124 }
+  - { offset: 0x120C, size: 0x8, addend: 0x0, symName: _byteMask, symObjAddr: 0x0, symBinAddr: 0x7D0, symSize: 0x234 }
+  - { offset: 0x1309, size: 0x8, addend: 0x0, symName: _byteMask, symObjAddr: 0x0, symBinAddr: 0x7D0, symSize: 0x234 }
+  - { offset: 0x143C, size: 0x8, addend: 0x0, symName: _bytesPosition, symObjAddr: 0x234, symBinAddr: 0xA04, symSize: 0x234 }
+  - { offset: 0x24BC, size: 0x8, addend: 0x0, symName: _WolframLibrary_getVersion, symObjAddr: 0x0, symBinAddr: 0xC38, symSize: 0x8 }
+  - { offset: 0x2580, size: 0x8, addend: 0x0, symName: _WolframLibrary_getVersion, symObjAddr: 0x0, symBinAddr: 0xC38, symSize: 0x8 }
+  - { offset: 0x2599, size: 0x8, addend: 0x0, symName: _WolframLibrary_initialize, symObjAddr: 0x8, symBinAddr: 0xC40, symSize: 0x14 }
+  - { offset: 0x25C1, size: 0x8, addend: 0x0, symName: _WolframLibrary_uninitialize, symObjAddr: 0x1C, symBinAddr: 0xC54, symSize: 0x10 }
+  - { offset: 0x356B, size: 0x8, addend: 0x0, symName: _createSignal, symObjAddr: 0x0, symBinAddr: 0xC64, symSize: 0xA0 }
+  - { offset: 0x3592, size: 0x8, addend: 0x0, symName: _receiver, symObjAddr: 0x350, symBinAddr: 0x8000, symSize: 0x0 }
+  - { offset: 0x45BF, size: 0x8, addend: 0x0, symName: _createSignal, symObjAddr: 0x0, symBinAddr: 0xC64, symSize: 0xA0 }
+  - { offset: 0x461F, size: 0x8, addend: 0x0, symName: _createWaitLoop, symObjAddr: 0xA0, symBinAddr: 0xD04, symSize: 0x5C }
+  - { offset: 0x467F, size: 0x8, addend: 0x0, symName: _waitSignal, symObjAddr: 0xFC, symBinAddr: 0xD60, symSize: 0x128 }
+  - { offset: 0x46F7, size: 0x8, addend: 0x0, symName: _notifySignal, symObjAddr: 0x224, symBinAddr: 0xE88, symSize: 0x8C }
+  - { offset: 0x4765, size: 0x8, addend: 0x0, symName: _closeSignal, symObjAddr: 0x2B0, symBinAddr: 0xF14, symSize: 0xA0 }
+...

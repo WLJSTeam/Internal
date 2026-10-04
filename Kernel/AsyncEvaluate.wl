@@ -3,7 +3,7 @@
 BeginPackage["WLJS`Internal`AsyncEvaluate`", {
     "LibraryLink`",
     "Parallel`Developer`",
-    "WLJS`CSockets`"
+    "WLJS`Internal`Library`"
 }];
 
 
@@ -16,10 +16,6 @@ AsyncEvaluate::usage =
 
 $AsyncTasks::usage =
 "$AsyncTasks - all async tasks.";
-
-
-AsyncTaskObject::usag =
-"AsyncTaskObject[id] - task representation.";
 
 
 Begin["`Private`"];
@@ -38,51 +34,50 @@ With[{id = If[#, Hash[Hold[expr]], Hash[CreateUUID[]]]& @ OptionValue["Once"]},
     initAsyncTools[];
 
     If[!KeyExistsQ[$AsyncTasks, id], $AsyncTasks[id] = <|
-        "Task" -> ParallelSubmit[expr],
+        "Task" -> ParallelSubmit[
+            With[{result = expr},
+                WLJS`Internal`Library`Private`notifySignal[];
+                Return[result]
+            ]
+        ],
         "Id" -> id,
         "Handler" -> handler
     |>];
 
-    AsyncTaskObject[id]
+    While[Parallel`Developer`QueueRun[], {}];
 ];
 
 
 If[!ValueQ[$asyncToolsNeedInit], $asyncToolsNeedInit = True];
 
 
-$asyncTaskCompleteHandler = Function[
-    $AsyncTasks[ToExpression[#Data]]["Handler"]
-];
+With[{dir = DirectoryName[$InputFileName, 2]},
+    initAsyncTools[] :=
+    If[$asyncToolsNeedInit,
+        $AsyncTasks = <||>;
 
+        WLJS`Internal`Library`Private`createSignal[];
 
-initAsyncTools[] :=
-If[$asyncToolsNeedInit,
-    $AsyncTasks = <||>;
+        LaunchKernels[];
 
-    LaunchKernels[];
-
-    $asyncTaskServer = CSocketOpen[];
-    $asyncTaskListener = SocketListen
-
-    With[{port = $asyncTaskServer["DestinationPort"], host = "localhost"},
         ParallelEvaluate[
-            Get["WLJS`CSockets`"];
-            $$client = CSocketConnect[host, port];
-            $$done[id_] := WriteString[$$client, ToString[id]];
+            PacletDirectoryLoad[dir];
+            Get["WLJS`Internal`Library`"];
         ];
-    ];
 
-    $asyncToolsNeedInit = False;
+        Internal`CreateAsynchronousTask[WLJS`Internal`Library`Private`createWaitLoop, {}, checkAsyncTasks[{##}]&];
+
+        $asyncToolsNeedInit = False;
+    ];
 ];
 
 
-checkAsyncTasks[] :=
-If[Length[$asyncTasks] > 0,
-    Parallel`Developer`QueueRun[];
+checkAsyncTasks[args_] :=
+If[Echo[args[[2]]]; Length[$AsyncTasks] > 0,
     Map[If[Parallel`Developer`DoneQ[#Task],
-        KeyDropFrom[$asyncTasks, #Id];
+        KeyDropFrom[$AsyncTasks, #Id];
         #Handler[ReleaseHold[#Task["Result"]]]
-    ]&, $asyncTasks]
+    ]&, $AsyncTasks]
 ];
 
 
@@ -112,22 +107,6 @@ AsyncEvaluate[
     func,
     "Once" -> True
 ];
-
-
-$asyncTasks =
-<||>;
-
-
-$directory =
-DirectoryName[$InputFileName, 2];
-
-
-$backgroundTaskLibrary =
-LibraryResource[$directory, "backgroundTask"];
-
-
-startBackgroundTask =
-LibraryFunctionLoad[$backgroundTaskLibrary, "startBackgroundTask", {Integer, Integer}, Integer];
 
 
 End[];

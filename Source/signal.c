@@ -24,11 +24,13 @@ DLLEXPORT int createSignal(WolframLibraryData libData, mint Argc, MArgument *Arg
         return LIBRARY_FUNCTION_ERROR;
     }
 #else
+    sem_unlink(SIGNAL_NAME);
     Signal signal = sem_open(
         SIGNAL_NAME, O_CREAT | O_EXCL, 0600, 0
     );
 
     if (signal == SEM_FAILED) {
+        fprintf(stderr, "sem_open failed: %d\n", errno);
         return LIBRARY_FUNCTION_ERROR;
     }
 #endif
