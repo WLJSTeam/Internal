@@ -49,6 +49,8 @@ With[{id = If[#, Hash[Hold[expr]], Hash[CreateUUID[]]]& @ OptionValue["Once"]},
     |>];
 
     Parallel`Developer`QueueRun[];
+
+    Return[$AsyncTasks[id]]
 ];
 
 
