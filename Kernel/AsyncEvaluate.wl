@@ -14,6 +14,10 @@ AsyncEvaluate::usage =
 "AsyncEvaluate[expr, callback] evaluates expression on parallel kernel and call callback[result] function on master kernel.";
 
 
+URLReadAsync::usage =
+"URLReadAsync[request, func] execute request in async mode and call func on response.";
+
+
 $AsyncTasks::usage =
 "$AsyncTasks - all async tasks.";
 
@@ -44,18 +48,19 @@ With[{id = If[#, Hash[Hold[expr]], Hash[CreateUUID[]]]& @ OptionValue["Once"]},
         "Handler" -> handler
     |>];
 
-    While[Parallel`Developer`QueueRun[], {}];
+    Parallel`Developer`QueueRun[];
 ];
 
 
 If[!ValueQ[$asyncToolsNeedInit], $asyncToolsNeedInit = True];
 
 
+If[!AssociationQ[$AsyncTasks], $AsyncTasks = <||>];
+
+
 With[{dir = DirectoryName[$InputFileName, 2]},
     initAsyncTools[] :=
     If[$asyncToolsNeedInit,
-        $AsyncTasks = <||>;
-
         WLJS`Internal`Library`Private`createSignal[];
 
         LaunchKernels[];
@@ -73,7 +78,8 @@ With[{dir = DirectoryName[$InputFileName, 2]},
 
 
 checkAsyncTasks[args_] :=
-If[Echo[args[[2]]]; Length[$AsyncTasks] > 0,
+If[Length[$AsyncTasks] > 0,
+    While[Parallel`Developer`QueueRun[], {}];
     Map[If[Parallel`Developer`DoneQ[#Task],
         KeyDropFrom[$AsyncTasks, #Id];
         #Handler[ReleaseHold[#Task["Result"]]]
