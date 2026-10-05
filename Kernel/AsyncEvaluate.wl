@@ -34,24 +34,27 @@ SetAttributes[AsyncEvaluate, HoldFirst];
 
 
 AsyncEvaluate[expr_, handler_, OptionsPattern[]] :=
-With[{id = If[#, Hash[Hold[expr]], Hash[CreateUUID[]]]& @ OptionValue["Once"]},
+Block[{$$task}, With[{id = If[#, Hash[Hold[expr]], Hash[CreateUUID[]]]& @ OptionValue["Once"]},
     initAsyncTools[];
 
-    If[!KeyExistsQ[$AsyncTasks, id], $AsyncTasks[id] = <|
+    If[!KeyExistsQ[$AsyncTasks, id],
+        $AsyncTasks[id] = <|
         "Task" -> ParallelSubmit[
             With[{result = expr},
                 WLJS`Internal`Library`Private`notifySignal[];
-                Return[result]
+                result
             ]
         ],
         "Id" -> id,
         "Handler" -> handler
     |>];
 
+    $$task = $AsyncTasks[id];
+
     Parallel`Developer`QueueRun[];
 
-    Return[$AsyncTasks[id]]
-];
+    Return[$$task]
+]];
 
 
 If[!ValueQ[$asyncToolsNeedInit], $asyncToolsNeedInit = True];
