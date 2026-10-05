@@ -3,3 +3,8 @@
 .fake
 *.exp
 *.lib
+*.pdb
+*.obj
+*.so
+*.dylib
+/LibraryResources/*/Working-*
