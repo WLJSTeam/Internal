@@ -4,7 +4,8 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/Applications/Wolfram Engine.app/Contents/Resources/Wolfram Player.app/Contents/SystemFiles/IncludeFiles/C"
+                "/Applications/Wolfram Engine.app/Contents/Resources/Wolfram Player.app/Contents/SystemFiles/IncludeFiles/C",
+                "C:/Program Files/Wolfram Research/Wolfram/15.0/SystemFiles/IncludeFiles/C"
             ],
             "defines": [
                 "_DEBUG",
