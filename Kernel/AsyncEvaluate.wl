@@ -65,7 +65,9 @@ With[{dir = DirectoryName[$InputFileName, 2]},
     If[$asyncToolsNeedInit,
         WLJS`Internal`Library`Private`createSignal[];
 
-        LaunchKernels[];
+        If[Length[Kernels[]] === 0,
+            LaunchKernels[]
+        ];
 
         ParallelEvaluate[
             PacletDirectoryLoad[dir];
@@ -81,11 +83,12 @@ With[{dir = DirectoryName[$InputFileName, 2]},
 
 checkAsyncTasks[args_] :=
 If[Length[$AsyncTasks] > 0,
-    While[Parallel`Developer`QueueRun[], {}];
-    Map[If[Parallel`Developer`DoneQ[#Task],
-        KeyDropFrom[$AsyncTasks, #Id];
-        #Handler[ReleaseHold[#Task["Result"]]]
-    ]&, $AsyncTasks]
+    While[Parallel`Developer`QueueRun[],
+        Map[If[Parallel`Developer`DoneQ[#Task],
+            KeyDropFrom[$AsyncTasks, #Id];
+            #Handler[ReleaseHold[#Task["Result"]]]
+        ]&, $AsyncTasks]
+    ]
 ];
 
 
