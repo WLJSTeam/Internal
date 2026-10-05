@@ -34,7 +34,7 @@ SetAttributes[AsyncEvaluate, HoldFirst];
 
 
 AsyncEvaluate[expr_, handler_, OptionsPattern[]] :=
-Block[{$$task}, With[{id = If[#, Hash[Hold[expr]], Hash[CreateUUID[]]]& @ OptionValue["Once"]},
+Module[{task}, With[{id = If[#, Hash[Hold[expr]], Hash[CreateUUID[]]]& @ OptionValue["Once"]},
     initAsyncTools[];
 
     If[!KeyExistsQ[$AsyncTasks, id],
@@ -49,11 +49,11 @@ Block[{$$task}, With[{id = If[#, Hash[Hold[expr]], Hash[CreateUUID[]]]& @ Option
         "Handler" -> handler
     |>];
 
-    $$task = $AsyncTasks[id];
+    task = $AsyncTasks[id];
 
     Parallel`Developer`QueueRun[];
 
-    Return[$$task]
+    Return[task]
 ]];
 
 
