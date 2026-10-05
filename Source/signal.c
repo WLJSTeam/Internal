@@ -19,24 +19,50 @@ DLLEXPORT int createSignal(WolframLibraryData libData, mint Argc, MArgument *Arg
         return LIBRARY_FUNCTION_ERROR;
     }
 
-    if (GetLastError() == ERROR_ALREADY_EXISTS) {
+    for (;;) {
+        DWORD result = WaitForSingleObject(signal, 0);
+
+        if (result == WAIT_OBJECT_0) {
+            continue;
+        }
+
+        if (result == WAIT_TIMEOUT) {
+            break; // Счётчик равен нулю.
+        }
+
         CloseHandle(signal);
         return LIBRARY_FUNCTION_ERROR;
     }
 #else
-    sem_unlink(SIGNAL_NAME);
     Signal signal = sem_open(
-        SIGNAL_NAME, O_CREAT | O_EXCL, 0600, 0
+        SIGNAL_NAME, O_CREAT, 0600, 0
     );
 
     if (signal == SEM_FAILED) {
-        fprintf(stderr, "sem_open failed: %d\n", errno);
+        return LIBRARY_FUNCTION_ERROR;
+    }
+
+    for (;;) {
+        if (sem_trywait(signal) == 0) {
+            continue;
+        }
+
+        int error = errno;
+
+        if (error == EINTR) {
+            continue;
+        }
+
+        if (error == EAGAIN) {
+            break; // Счётчик равен нулю.
+        }
+
+        sem_close(signal);
         return LIBRARY_FUNCTION_ERROR;
     }
 #endif
 
     receiver = signal;
-
     return LIBRARY_NO_ERROR;
 }
 
@@ -116,26 +142,19 @@ DLLEXPORT int notifySignal(WolframLibraryData libData, mint Argc, MArgument *Arg
 DLLEXPORT int closeSignal(WolframLibraryData libData, mint Argc, MArgument *Args, MArgument Res)
 {
     if (receiver == INVALID_SIGNAL) {
-        return LIBRARY_FUNCTION_ERROR;
+        return LIBRARY_NO_ERROR;
     }
 
 #ifdef _WIN32
     if (!CloseHandle(receiver)) {
         return LIBRARY_FUNCTION_ERROR;
     }
-
-    receiver = INVALID_SIGNAL;
 #else
     if (sem_close(receiver) != 0) {
         return LIBRARY_FUNCTION_ERROR;
     }
-
-    receiver = INVALID_SIGNAL;
-
-    if (sem_unlink(SIGNAL_NAME) != 0) {
-        return LIBRARY_FUNCTION_ERROR;
-    }
 #endif
 
+    receiver = INVALID_SIGNAL;
     return LIBRARY_NO_ERROR;
 }
