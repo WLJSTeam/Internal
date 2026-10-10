@@ -40,7 +40,7 @@ Module[{task}, With[{id = If[#, Hash[Hold[expr]], Hash[CreateUUID[]]]& @ OptionV
     If[!KeyExistsQ[$AsyncTasks, id],
         $AsyncTasks[id] = <|
         "Task" -> ParallelSubmit[
-            With[{result = expr},
+            With[{result = Check[expr, $Failed]},
                 WLJS`Internal`Library`Private`notifySignal[];
                 result
             ]
@@ -86,12 +86,11 @@ With[{dir = DirectoryName[$InputFileName, 2]},
 
 checkAsyncTasks[args_] :=
 If[Length[$AsyncTasks] > 0,
-    While[Parallel`Developer`QueueRun[],
-        Map[If[Parallel`Developer`DoneQ[#Task],
-            KeyDropFrom[$AsyncTasks, #Id];
-            #Handler[ReleaseHold[#Task["Result"]]]
-        ]&, $AsyncTasks]
-    ]
+    While[!Parallel`Developer`QueueRun[], {}];
+    Map[If[Parallel`Developer`DoneQ[#Task],
+        KeyDropFrom[$AsyncTasks, #Id];
+        #Handler[ReleaseHold[#Task["Result"]]]
+    ]&, $AsyncTasks]
 ];
 
 
