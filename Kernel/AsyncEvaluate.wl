@@ -40,7 +40,7 @@ Module[{task}, With[{id = If[#, Hash[Hold[expr]], Hash[CreateUUID[]]]& @ OptionV
     If[!KeyExistsQ[$AsyncTasks, id],
         $AsyncTasks[id] = <|
         "Task" -> ParallelSubmit[
-            With[{result = Check[expr, $Failed]},
+            With[{result = expr},
                 WLJS`Internal`Library`Private`notifySignal[];
                 result
             ]
