@@ -7,9 +7,6 @@ BeginPackage["WLJS`Internal`AsyncEvaluate`", {
 }];
 
 
-ClearAll["`*"];
-
-
 AsyncEvaluate::usage =
 "AsyncEvaluate[expr, callback] evaluates expression on parallel kernel and call callback[result] function on master kernel.";
 
