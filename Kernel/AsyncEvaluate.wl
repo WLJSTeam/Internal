@@ -94,34 +94,6 @@ If[Length[$AsyncTasks] > 0,
 ];
 
 
-URLReadAsync[request_HTTPRequest, func_, "Stream"] :=
-AsyncEvaluate[
-    Module[{
-        stream = URLRead[request, "Stream"], part = "", response = ""
-    },
-        While[True,
-            part = ReadString[stream];
-            If[part === EndOfFile, Break[]];
-            response = response <> part;
-        ];
-
-        Close[stream];
-
-        response
-    ],
-    func,
-    "Once" -> True
-];
-
-
-URLReadAsync[request_HTTPRequest, func_] :=
-AsyncEvaluate[
-    URLRead[request],
-    func,
-    "Once" -> True
-];
-
-
 End[];
 
 
