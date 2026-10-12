@@ -14,10 +14,6 @@ AsyncEvaluate::usage =
 "AsyncEvaluate[expr, callback] evaluates expression on parallel kernel and call callback[result] function on master kernel.";
 
 
-URLReadAsync::usage =
-"URLReadAsync[request, func] execute request in async mode and call func on response.";
-
-
 $AsyncTasks::usage =
 "$AsyncTasks - all async tasks.";
 
