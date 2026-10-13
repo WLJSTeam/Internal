@@ -27,7 +27,7 @@ DLLEXPORT int createSignal(WolframLibraryData libData, mint Argc, MArgument *Arg
         }
 
         if (result == WAIT_TIMEOUT) {
-            break; // Счётчик равен нулю.
+            break;
         }
 
         CloseHandle(signal);
@@ -54,7 +54,7 @@ DLLEXPORT int createSignal(WolframLibraryData libData, mint Argc, MArgument *Arg
         }
 
         if (error == EAGAIN) {
-            break; // Счётчик равен нулю.
+            break;
         }
 
         sem_close(signal);
