@@ -7,7 +7,7 @@ PacletObject[
     "Creator" -> "Kirill",
     "License" -> "MIT",
     "PublisherID" -> "WLJS",
-    "Version" -> "1.0.10",
+    "Version" -> "1.0.11",
     "WolframVersion" -> "13+",
     "Extensions" -> {
       {
